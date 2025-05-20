@@ -369,23 +369,26 @@
   }
 
   // Función para enviar comandos a Django
-  function enviarComando(comando) {
-    fetch("/set_comando", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-CSRFToken": getCookie('csrftoken')
-      },
-      body: `comando=${comando}`
+function enviarComando(comando) {
+    fetch("https://web-production-ad431.up.railway.app/set_comando/", {
+        method: "POST",
+        headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `comando=${encodeURIComponent(comando)}`
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) throw new Error("Respuesta no OK");
+        return response.json();
+    })
     .then(data => {
-      console.log("Comando enviado al servidor Django:", data);
+        console.log("Comando enviado al servidor Django:", data);
     })
     .catch(error => {
-      console.error("Error al enviar comando:", error);
+        console.error("Error al enviar comando:", error);
     });
-  }
+}
+
 
   // Función auxiliar para obtener el token CSRF
   function getCookie(name) {
