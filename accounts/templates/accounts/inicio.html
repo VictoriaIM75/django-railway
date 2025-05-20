@@ -355,7 +355,7 @@
     $('#pwmSlider').on('input', function () {
         const valor = $(this).val();
         $('#valor').text(valor + "%");
-        fetch(`http://192.168.0.28/comando?accion=PWM&valor=${valor}`)
+        fetch(`https://web-production-ad431.up.railway.app/comando?accion=PWM&valor=${valor}`)
         .then(response => response.text())
         .then(texto => {
             console.log("Respuesta del ESP32:", texto);
@@ -375,7 +375,7 @@
     }
 
 function enviarComando(comando) {
-  fetch(`http://192.168.0.28/comando?accion=${comando}`)
+  fetch(`https://web-production-ad431.up.railway.app/comando?accion=${comando}`)
     .then(response => response.text())
     .then(texto => {
       console.log("Respuesta del ESP32:", texto);
@@ -390,7 +390,7 @@ function enviarComando(comando) {
 <script>
     
 function obtenerDatosSensores() {
-    fetch('http://192.168.0.28/sensorData')
+    fetch('https://web-production-ad431.up.railway.app/sensorData')
         .then(response => response.json())
         .then(data => {
             document.getElementById('valorFlujo').innerText = data.flujo;

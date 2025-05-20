@@ -229,7 +229,7 @@ def usuariosPage(request):
 
 def sensor_data(request):
     # Hacer una solicitud GET a la URL del ESP32
-    url = 'http://192.168.0.28/sensorData'
+    url = 'https://web-production-ad431.up.railway.app/sensorData'
     response = requests.get(url)
     
     # Si la solicitud fue exitosa, obtenemos los datos
