@@ -390,7 +390,7 @@ function enviarComando(comando) {
 <script>
     
 function obtenerDatosSensores() {
-    fetch('https://web-production-ad431.up.railway.app/sensorData')
+    fetch('http://192.168.0.28/sensorData')
         .then(response => response.json())
         .then(data => {
             document.getElementById('valorFlujo').innerText = data.flujo;
