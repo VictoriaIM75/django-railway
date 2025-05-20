@@ -38,6 +38,7 @@ urlpatterns = [
     path('resultados_todos/', views.resultados_todos, name='resultados_todos'),
     path('actualizar_datos', views.actualizar_datos, name='actualizar_datos'),
     path('api/datos_sensores', views.api_datos_sensores, name='api_datos_sensores'),
-
+    path('set_comando/', views.recibir_comando, name='recibir_comando'),
+    path('get_comando/', views.enviar_comando_esp32, name='enviar_comando_esp32'),
 
 ]
