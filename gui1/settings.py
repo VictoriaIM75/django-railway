@@ -91,11 +91,14 @@ WSGI_APPLICATION = 'gui1.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "djangodb",
-        "USER": "root",
-        "PASSWORD": "",
-        "HOST": "localhost",
-        "PORT": "3306",
+        "NAME": os.environ.get("djangodb"),
+        "USER": os.environ.get("root"),
+        "PASSWORD": os.environ.get(""),
+        "HOST": os.environ.get("localhost"),
+        "PORT": os.environ.get("3306"),
+        "OPTIONS": {
+        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+         }
     }
 }
 
