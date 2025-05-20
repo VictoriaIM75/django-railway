@@ -29,9 +29,9 @@ SECRET_KEY = 'django-insecure-0q=+72c9#g5^6_a&!&*u2io($$1+a(2f@d8@z1rengp3)5yuns
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'web-production-ad431.up.railway.app']
+# ALLOWED_HOSTS = ['localhost', 'web-production-ad431.up.railway.app']
 
-# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -88,19 +88,60 @@ WSGI_APPLICATION = 'gui1.wsgi.application'
 #    }
 #}
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": os.environ.get("djangodb"),
+#         "USER": os.environ.get("root"),
+#         "PASSWORD": os.environ.get(""),
+#         "HOST": os.environ.get("localhost"),
+#         "PORT": os.environ.get("3306"),
+#         "OPTIONS": {
+#         'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#          }
+#     }
+# }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": os.environ.get("MYSQLDATABASE"),
+#         "USER": os.environ.get("MYSQLUSER"),
+#         "PASSWORD": os.environ.get("MYSQLPASSWORD"),
+#         "HOST": os.environ.get("MYSQLHOST"),
+#         "PORT": os.environ.get("MYSQLPORT", "3306"),
+#         "OPTIONS": {
+#             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+#         },
+#     }
+# }
+
+
+# DATABASES = {
+#      "default": {
+#          "ENGINE": "django.db.backends.mysql",
+#          "NAME": "djangodb",
+#          "USER": "root",
+#          "PASSWORD":"",
+#          "HOST": "localhost",
+#          "PORT":  "3306",
+
+#      }
+#  }
+
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.environ.get("djangodb"),
-        "USER": os.environ.get("root"),
-        "PASSWORD": os.environ.get(""),
-        "HOST": os.environ.get("localhost"),
-        "PORT": os.environ.get("3306"),
-        "OPTIONS": {
-        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-         }
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
+
+
 
 
 # Password validation
