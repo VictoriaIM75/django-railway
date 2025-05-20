@@ -26,7 +26,6 @@ urlpatterns = [
     path('update_order/<str:pk>', views.updateOrder, name = "update_order"),
     path('delete_order/<str:pk>', views.deleteOrder, name = "delete_order"),
 
-    path('sensorData', views.sensor_data, name='sensor_data'),
 
 
     path('iniciar/', views.iniciar_quiz, name='iniciar_quiz'),
