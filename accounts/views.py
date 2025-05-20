@@ -64,7 +64,7 @@ def loginPage(request):
 
         if user is not None:
             login(request, user)
-            return redirect('home')
+            return redirect('inicio')
         else:
             messages.info(request, 'Usuario o contraseña incorrectos')
     context = {}
