@@ -456,11 +456,15 @@ def recibir_comando(request):
             return JsonResponse({"status": "error", "mensaje": "Comando no proporcionado"})
     return JsonResponse({"status": "error", "mensaje": "Método no permitido"})
 
+@csrf_exempt
 def enviar_comando_esp32(request):
     global ultimo_comando
-    comando = ultimo_comando
-    ultimo_comando = ""  # Se borra luego de enviar para evitar repeticiones
-    return JsonResponse({"comando": comando})
+    if request.method == "GET":
+        comando = ultimo_comando
+        ultimo_comando = ""  # Limpiar después de enviar
+        return JsonResponse({"accion": comando, "valor": ""})  # Ajusta el JSON según tus necesidades
+    else:
+        return JsonResponse({"status": "error", "mensaje": "Método no permitido"})
 
 @csrf_exempt
 def actualizar_datos(request):
