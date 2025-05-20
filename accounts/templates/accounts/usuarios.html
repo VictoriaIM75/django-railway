@@ -1,0 +1,46 @@
+{% extends 'accounts/main.html' %}
+
+{% block content %}
+<div class="card card-body">
+  <h5>Lista de Usuarios</h5>
+</div>
+
+<br />
+<div class="row">
+  <div class="col">
+    <div class="card card-body">
+
+      <form method="get">
+        {{ myFilter.form.as_p }}
+        
+        
+        <button class="btn btn-success" type="submit">Buscar</button>
+      </form>
+    </div>
+  </div>
+</div>
+<br />
+
+<div class="card card-body">
+  <table class="table">
+    <tr>
+      <th>Usuario</th>
+      <th>Función</th>
+      <th>Email</th>
+      <th>Fecha de ingreso</th>
+      <th>Editar</th>
+      <th>Eliminar</th>
+    </tr>
+    {% for user in users %}
+    <tr>
+      <td>{{ user.username }}</td>
+      <td>{{ user.groups.first.name }}</td>
+      <td>{{ user.email }}</td>
+      <td>{{ user.date_joined }}</td>
+      <td><a class="btn btn-sm btn-info" href="{% url 'update_user' user.id %}">Editar</a></td>
+      <td><a class="btn btn-sm btn-danger" href="{% url 'delete_user' user.id %}">Eliminar</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

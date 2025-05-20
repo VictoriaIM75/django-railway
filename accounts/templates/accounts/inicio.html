@@ -1,0 +1,764 @@
+{% extends 'accounts/main.html' %}
+
+{% block content %}
+
+{% load static %}
+
+<style>
+    .area {
+        position: absolute;
+        cursor: pointer;
+        /* opcional: para ver las zonas mientras pruebas */
+        /* background-color: rgba(255, 0, 0, 0.2); */
+    }
+    .sensor-data {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            row-gap: 10px;
+            column-gap: 10px;
+        }
+
+        .sensor-title {
+            font-weight: 600;
+            color: #0d6efd;
+        }
+
+        .sensor-value span {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+
+        .unit {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .card-body h5 {
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        input[type=range] {
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .sensor-data {
+                grid-template-columns: 1fr; /* Una sola columna en móviles */
+            }
+        }
+
+
+        .colorCardPWM {
+            background: #251d1d;
+        }
+        
+        #mensajeinformacionsistema{
+            background: #89d668;
+            font-size: 10px;
+            
+        }
+
+
+
+
+
+        .card {
+            border-radius: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .slider-value {
+            font-weight: bold;
+            text-align: center;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            /* Chrome, Safari, Opera */
+            appearance: none;
+            /* Firefox, Edge */
+            width: 100%;
+            height: 8px;
+            background: #ffffff;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        /* Track */
+        input[type=range]::-webkit-slider-runnable-track {
+            height: 8px;
+            background: #ffffff;
+            /* Cambia este color */
+            border-radius: 5px;
+        }
+
+        /* Thumb (el "botón" del slider) */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #ff1c07;
+            /* Amarillo */
+            margin-top: -6px;
+            /* Alinear con el track */
+            cursor: pointer;
+        }
+
+        /* Firefox */
+        input[type=range]::-moz-range-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #ffc107;
+            cursor: pointer;
+        }
+
+        input[type=range]::-moz-range-track {
+            background: #0d6efd;
+            height: 8px;
+            border-radius: 5px;
+        }
+
+        #pwmSlider::-webkit-slider-runnable-track {
+            background: #ed1111;
+        }
+
+
+        #pwmSlider::-webkit-slider-thumb {
+            background: #d01414;
+            /* Gris oscuro */
+        }
+
+</style>
+
+
+<br>
+
+
+<!-- Bootstrap CSS CDN -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@600&display=swap" rel="stylesheet">
+
+
+<div class="row card card-body m-2 text-center  ">
+    <h2>Modelo Didáctico de Sistema de Preparación de Líquido Dializante</h2>
+</div>
+<div class="row m-2">
+    <div class="col-12 col-sm-4 col-md-3 col-lg-2 mb-3">
+        <div class="card card-body ">
+            <nav class="nav flex-column">
+                <h5 class="mb-3 text-center">Menú</h5>
+                <ul class="nav flex-column  nav-pills nav-fill">
+                    <li class="nav-item text-center mb-3">
+                        <a class="nav-link active bg-dark" href="{% url 'iniciar_quiz' %}">Iniciar Quiz</a>
+                    </li>
+                    <li class="nav-item text-center mb-3 ">
+                        <a class="nav-link active bg-dark" href="{% url 'ingresar_contraseña' %}">Editar Quiz</a>
+                    </li>
+                    <li class="nav-item text-center mb-3 ">
+                        <a class="nav-link active bg-dark" href="{% url 'ingresar_contraseñaresultados' %}">Resultados</a>
+                    </li>
+                    <!-- Puedes agregar más enlaces aquí -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="col-12 col-sm-8 col-md-9 col-lg-7 mb-3">
+        <div class="card card-body">
+            <div class="card card-body mb-3">
+                <h2>Etapas</h2>
+                <div class="form-group">
+                    <select class="custom-select" name="" id="etapaseleccionada" onchange="showImage()">
+
+                        <option selected>Selecciona una Etapa</option>
+                        <option value="etapa1" class="seleccionetapa1">Etapa 1</option>
+                        <option value="etapa2" class="seleccionetapa2">Etapa 2</option>
+                        <option value="etapa3" class="seleccionetapa3">Etapa 3</option>
+                        <option value="etapa4" class="seleccionetapa4">Etapa 4</option>
+                        <option value="etapa5" class="seleccionetapa5">Etapa 5</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card card-body mb-3" style="max-width: 100%;">
+
+                <div class="position-relative w-100">
+                    <img src="/static/images/Etapa0.png" alt="Imagen seleccionada" class="img-fluid" id="imagen-base">
+
+                    <!-- Áreas interactivas -->
+                    <div class="area" data-toggle="tooltip" title="Etapa 1: Agua para dialisis"
+                        style="top: 31.04%; left: 6.19%; width: 7.50%; height: 10.99%;"
+                        onclick="cambiarContenido('etapa1')"></div>
+                    <div class="area" data-toggle="tooltip" title="Etapa 1: Sensor de Flujo"
+                        style="top: 32.14%; left: 16.38%; width: 4.88%; height: 8.63%;"
+                        onclick="cambiarContenido('etapa1')"></div>
+                    <div class="area" data-toggle="tooltip" title="Etapa 2: Mezcla de concentrados"
+                        style="top: 31.04%; left: 24.82%; width: 11.13%; height: 10.60%;"
+                        onclick="cambiarContenido('etapa2')"></div>
+                    <div class="area" data-toggle="tooltip" title="Etapa 2: Concentrado ácido"
+                        style="top: 1.51%; left: 22.34%; width: 3.85%; height: 12.64%;"
+                        onclick="cambiarContenido('etapa2')"></div>
+                    <div class="area" data-toggle="tooltip" title="Etapa 2: Concentrado alcalino"
+                        style="top: 7.01%; left: 34.00%; width: 4.20%; height: 12.91%;"
+                        onclick="cambiarContenido('etapa2')"></div>
+                    <div class="area" data-toggle="tooltip" title="Etapa 3: Sensor de Conductividad"
+                        style="top: 31.46%; left: 39.74%; width: 4.52%; height: 9.89%;"
+                        onclick="cambiarContenido('etapa3')"></div>
+                    <div class="area" data-toggle="tooltip" title="Etapa 3: Sensor de Burbujas"
+                        style="top: 31.46%; left: 47.96%; width: 4.59%; height: 9.51%;"
+                        onclick="cambiarContenido('etapa3')"></div>
+                    <div class="area" data-toggle="tooltip" title="Etapa 3: Sensor de Temperatura"
+                        style="top: 31.87%; left: 56.91%; width: 4.66%; height: 9.07%;"
+                        onclick="cambiarContenido('etapa3')"></div>
+                    <div class="area" data-toggle="tooltip" title="Etapa 4: Filtro  Dializador"
+                        style="top: 47.66%; left: 56.27%; width: 5.83%; height: 32.41%;"
+                        onclick="cambiarContenido('etapa4')"></div>
+                    <div class="area" data-toggle="tooltip" title="Etapa 5: Drenaje"
+                        style="top: 90.38%; left: 35.22%; width: 8.29%; height: 6.04%;"
+                        onclick="cambiarContenido('etapa5')"></div>
+                </div>
+
+
+            </div>
+            <div class="card card-body mb-3" id="tarjeta-info">
+                <p id="info">Haz clic sobre un componente para ver su detalle.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-4 col-md-3 mb-3">
+        <h4 class="mb-4">Panel de control</h4>
+    
+        <div class="card card-body mb-3">
+            <h5 class="mb-3">Lecturas de Sensores</h5>
+            <div class="sensor-data">
+                <div class="sensor-title">Flujo</div>
+                <div class="sensor-value" id="valorsensor1">
+                    <span id="valorFlujo">{{ sensor_data.flujo }}</span>
+                </div>
+                <div class="unit">ml/min</div>
+                <div></div>
+
+                <div class="sensor-title">Conductividad</div>
+                <div class="sensor-value" id="valorsensor2">
+                    <span id="valorConductividad">{{ sensor_data.conductividad }}</span>
+                </div>
+                <div class="unit">uS/cm</div>
+                <div></div>
+
+                <div class="sensor-title">Burbuja</div>
+                <div class="sensor-value" id="valorsensor3">
+                    <span id="valorBurbuja">{{ sensor_data.burbuja }}</span>
+                </div>
+                <div></div>
+
+
+
+            </div>
+        </div>
+
+            <div class="card card-body mb-3">
+            <h5 class="mb-3 text-center ">Información del sistema</h5>
+            <div class="card card-body mb-3  " id="mensajeinformacionsistema" >
+                <div class= "w-100 d-block ">
+                    <div class=" text-white sensor-title text-center w-100" id="mensaje1">
+                        <span id="mensaje1" class="w-100 d-block" >{{ sensor_data.mensaje1 }}</span>
+                    </div>   
+                </div>             
+            </div>
+            
+        </div>
+    
+        <div class="card bg-light card-body mb-3">
+            <div class="card-header bg-danger text-white text-center">
+                Control PWM Bomba Principal
+            </div>
+            <div class="card-body">
+                <input type="range" class="form-range container-fluid" min="0" max="100" step="1" id="pwmSlider">
+                <div class="slider-value mt-2" id="valor">50%</div>
+            </div>
+        </div>
+    
+        <div class="card card-body">
+            <div class="  card bg-light">
+            <div class="card-header bg-info text-white text-center">
+                Valor Objetivo de Conductividad
+            </div>
+            <div class=" card-body">
+                <label for="calibracionConductividad" class="form-label">Ingrese valor objetivo (uS/cm):</label>
+                <div class="d-flex">
+                <input type="number" class="form-control" id="objetivoConductividad" placeholder="Ej: 1500">
+                <button class="btn btn-info ml-2" onclick="enviarObjetivoConductividad()">Set</button>
+
+                </div>
+
+            </div>
+            </div>
+        </div>
+
+
+        <div class="card card-body mt-3">
+            <div class="card bg-light">
+            <div class="card-header bg-danger text-white text-center">
+                Led integrado
+            </div>
+            <div class="card-body text-center">
+                <button class="btn btn-success ml-2" onclick="enviarComando('LON')">Encender</button>
+                <button class="btn btn-danger ml-2" onclick="enviarComando('LOFF')">Apagar</button>
+            </div>
+        </div>
+
+        </div>
+    </div>
+    
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="miModal" tabindex="-1" aria-labelledby="miModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="miModalLabel">Información</h5>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- El contenido del modal será insertado aquí -->
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Bootstrap JS CDN and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Optional: Chart.js for analytics graph -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/image-map-resizer/1.0.10/js/imageMapResizer.min.js"></script>
+
+
+
+
+<script>
+
+    $('#pwmSlider').on('input', function () {
+        const valor = $(this).val();
+        $('#valor').text(valor + "%");
+        fetch(`http://192.168.0.28/comando?accion=PWM&valor=${valor}`)
+        .then(response => response.text())
+        .then(texto => {
+            console.log("Respuesta del ESP32:", texto);
+        });
+    });
+
+    function enviarObjetivoConductividad() {
+        const valor = document.getElementById('objetivoConductividad').value;
+
+        if (valor === "") {
+        alert("Por favor, ingresa un valor.");
+        return;
+        }
+
+        // Usa tu función existente
+        enviarComando(`CO&valor=${valor}`);
+    }
+
+function enviarComando(comando) {
+  fetch(`http://192.168.0.28/comando?accion=${comando}`)
+    .then(response => response.text())
+    .then(texto => {
+      console.log("Respuesta del ESP32:", texto);
+    })
+    .catch(error => {
+      console.error("Error al enviar comando:", error);
+    });
+}
+</script>
+
+
+<script>
+    
+function obtenerDatosSensores() {
+    fetch('http://192.168.0.28/sensorData')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('valorFlujo').innerText = data.flujo;
+            document.getElementById('valorConductividad').innerText = data.conductividad;
+            document.getElementById('valorBurbuja').innerText = data.burbuja;
+            document.getElementById('mensaje1').innerText = data.mensaje1;
+
+        })
+        .catch(error => {
+            console.error('Error al obtener los datos:', error);
+        });
+}
+
+// Llamar al cargar la página
+obtenerDatosSensores();
+
+// Repetir cada 1 segundo (1000 ms)
+setInterval(obtenerDatosSensores, 1000);
+
+
+</script>
+
+
+<script>
+    window.onload = function () {
+        const datos = {
+            etapa1: {
+                imagen: '/static/images/Etapa1.png',
+                texto: `
+            <p>
+                En esta etapa, el agua tratada es adecuada para ingresar al circuito de líquido dializante. 
+                Este proceso consiste en atemperar al agua con un calentador, a temperaturas entre los 35°C y los 37°C 
+                para favorecer tanto la desgasificación como la posterior disolución de las sales en ella. 
+                También pasa a través de un desgasificador, con el fin de eliminar el oxígeno y otros gases disueltos del agua.
+            </p>
+            <p>
+                Los mecanismos de seguridad son esenciales ya que una mala desgasificación generaría burbujas de aire, 
+                que podrían hacer funcionar mal el detector de fugas de sangre y el detector de conductividad.
+            </p>
+            <button class="btn btn-light m-2" onclick="mostrarMensaje1()">Agua para diálisis</button>
+            <button class="btn btn-light m-2" onclick="mostrarMensaje2()">Flujo del líquido dializante</button>
+            `,
+                color: '#99ff66'
+            },
+            etapa2: {
+                imagen: '/static/images/Etapa2.png',
+                texto: `
+                    <p>
+                        En la preparación de líquido dializante para hemodiálisis, se utilizan concentrados de ácido y bicarbonato. 
+                        Estos concentrados son esenciales para la eliminación adecuada de toxinas y desechos del torrente sanguíneo del paciente durante la diálisis.
+                    </p>
+                    <p>
+                        <strong>Concentrado Ácido:</strong>
+                        <ul>
+                            <li><strong>Normales:</strong> 0.1 N o 2-4 mEq/L aprox. Crucial para mantener el equilibrio del pH sanguíneo durante la hemodiálisis.</li>
+                            <li><strong>Concentración baja:</strong> Alcalosis metabólica.</li>
+                            <li><strong>Concentración alta:</strong> Acidosis metabólica.</li>
+                        </ul>
+                    </p>
+                    <p>
+                        <strong>Concentrado Bicarbonato:</strong>
+                        <ul>
+                            <li><strong>Normales:</strong> 32-40 mEq/L. Ayuda a neutralizar los ácidos en la sangre y a mantener el equilibrio ácido-base.</li>
+                            <li><strong>Concentración baja:</strong> Acidosis metabólica.</li>
+                            <li><strong>Concentración alta:</strong> Alcalosis metabólica.</li>
+                        </ul>
+                    </p>
+                    <button class="btn btn-light m-2" onclick="mostrarMensajeLiquidoDialisis()">Líquido de Diálisis</button>
+                    <button class="btn btn-light m-2" onclick="mostrarMensajeLiquidoDialisisUltra()">Líquido de Diálisis Ultrapuro</button>
+                    <button class="btn btn-light m-2" onclick="mostrarMensajeConcentradoAcido()">Concentrado Ácido</button>
+                    <button class="btn btn-light m-2" onclick="mostrarMensajeConcentradoBicarbonato()">Concentrado Bicarbonato</button>
+                    `,
+
+                color: '#ffaa00'
+            },
+            etapa3: {
+                imagen: '/static/images/Etapa3.png',
+                texto: `
+                    <p>
+                        La conductividad del agua es un parámetro importante para controlar la calidad del líquido dializante. 
+                        Se mide en microsiemens por centímetro (µS/cm). Los valores normales de conductividad oscilan entre 13.6 y 14.4 µS/cm. 
+                        Si la conductividad es anormal, puede indicar una concentración inadecuada de electrolitos en el agua.
+                    </p>
+                    <p>
+                        La temperatura del líquido también es crítica para el funcionamiento adecuado del tratamiento. El rango normal de temperatura oscila entre 35°C y 37°C. 
+                        Temperaturas superiores a 37.5°C representan un riesgo de coagulación sanguínea, mientras que temperaturas por debajo de 34°C podrían causar hipotermia en el paciente.
+                    </p>
+                    <p>
+                        La presión del sistema es otro parámetro esencial. Los valores normales de presión suelen encontrarse entre 1.5 y 2.5 bares. 
+                        Una presión más alta podría ser indicativa de una obstrucción en el sistema, mientras que una presión baja podría indicar una fuga o mal funcionamiento en el equipo.
+                    </p>
+                    <button class="btn btn-light m-2" onclick="mostrarMensajeConductividad()">Conductividad</button>
+                    <button class="btn btn-light m-2" onclick="mostrarMensajeTemperatura()">Temperatura</button>
+                    <button class="btn btn-light m-2" onclick="mostrarMensajePresion()">Presión</button>
+                    `,
+                color: '#4dd2ff'
+            },
+            etapa4: {
+                imagen: '/static/images/Etapa4.png',
+                texto: `
+                <p>
+                    Consiste en interponer entre 2 compartimientos líquidos (sangre y líquido de diálisis) una membrana semipermeable. 
+                    Para ello se emplea un filtro o dializador. La membrana semipermeable permite que circulen agua y solutos de pequeño 
+                    y mediano peso molecular (PM), pero no proteínas o células sanguíneas, muy grandes como para atravesar los poros de la membrana.
+                </p>
+                <p>
+                    Los mecanismos físicos que regulan estas funciones son dos: la difusión o transporte por conducción y la ultrafiltración o 
+                    transporte por convección.
+                </p>
+                <button class="btn btn-light m-2" onclick="mostrarKoA()">KoA</button>
+                <button class="btn btn-light m-2" onclick="mostrarGradiente()">Gradiente de Concentración</button>
+                <button class="btn btn-light m-2" onclick="mostrarDialisancia()">Dialisancia Iónica</button>
+                <button class="btn btn-light m-2" onclick="mostrarUltrafiltracion()">Transporte por Convección (Ultrafiltración)</button>
+                <button class="btn btn-light m-2" onclick="mostrarDifusion()">Transporte por Difusión</button>
+            `,
+                color: '#e60000'
+            },
+            etapa5: {
+                imagen: '/static/images/Etapa5.png',
+                texto: `
+                    <p style="color: #ffffff;">
+                        Tras pasar por el dializador, el sistema se encarga de controlar posibles pérdidas hemáticas utilizando sensores ópticos de infrarrojos o ultrasonidos.
+                        Estos sistemas tienen una alta sensibilidad, capaces de detectar pérdidas tan pequeñas como 0.5 ml de sangre, incluso con un hematocrito del 25% y flujos de baño (Qd) de 500-800 ml/min.
+                    </p>
+                    <p style="color: #ffffff;">
+                        <strong>Detección de sangre en el dializado:</strong> Provoca una alarma y detiene inmediatamente la bomba de sangre.
+                    </p>
+                    <p style="color: #ffffff;">
+                        <strong>Indicadores de rotura de membrana:</strong> 
+                        <ul style="color: #ffffff;">
+                            <li>Presión Transmembrana (PTM) superior a 500 mmHg.</li>
+                            <li>Daño físico en la membrana del dializador.</li>
+                        </ul>
+                    </p>
+                    <button class="btn btn-light m-2" onclick="mostrarMensajeDrenaje()">Drenaje</button>
+                    <button class="btn btn-light m-2" onclick="mostrarMensajePTM()">Presión Transmembrana (PTM)</button>
+                    `,
+                color: '#8533ff'
+            }
+        };
+
+        window.cambiarContenido = function (etapa) {
+            if (datos[etapa]) {
+                // Cambiar la imagen
+                document.getElementById('imagen-base').src = datos[etapa].imagen;
+
+                // Cambiar el texto y color de la tarjeta
+                const tarjeta = document.getElementById('tarjeta-info');
+                tarjeta.innerHTML = `<p>${datos[etapa].texto}</p>`;
+                tarjeta.style.backgroundColor = datos[etapa].color;
+            }
+        };
+    };
+
+    window.showImage = function () {
+        const etapa = document.getElementById('etapaseleccionada').value;
+        if (etapa.startsWith('etapa')) {
+            cambiarContenido(etapa);
+        }
+    };
+
+    window.mostrarMensaje1 = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+        <p>Agua que ha sido tratada y es apta para ser usada en aplicaciones de hemodiálisis, 
+        incluyendo preparación de líquido de diálisis, reproceso de dializadores, preparación de concentrados 
+        y preparación de líquido de sustitución para terapias convectivas [HDF].</p>
+    `;
+        // Mostrar el modal
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+
+    window.mostrarMensaje2 = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+        <p>En la hemodiálisis, el flujo del líquido dializante (o dializado) es un aspecto crucial para la eficacia 
+        del tratamiento. El flujo típico del líquido dializante suele estar en el rango de 500 a 800 ml/min. 
+        Sin embargo, el flujo exacto puede variar dependiendo del tipo de máquina de hemodiálisis utilizada, 
+        las necesidades individuales del paciente y las prescripciones del médico.</p>
+        <p>Un flujo de líquido dializante adecuado es esencial para asegurar una eficiente remoción de toxinas y 
+        un buen equilibrio de electrolitos en la sangre del paciente.</p>
+    `;
+        // Mostrar el modal
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+    // Función para mostrar el mensaje de KoA
+    window.mostrarKoA = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+        <p>El KoA es un indicador de la eficacia del dializador, es decir su máxima capacidad de extraer solutos. 
+        Es una propiedad intrínseca del dializador y es suministrado por el fabricante. Se calcula en función del flujo 
+        sanguíneo (Qb), del flujo de diálisis (Qd) y del aclaramiento (K).</p>
+    `;
+        // Mostrar el modal
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+
+    // Función para mostrar el mensaje del Gradiente de Concentración
+    window.mostrarGradiente = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+        <p>Es la diferencia de concentración de un soluto entre el compartimiento sanguíneo y el del dializado. Este gradiente 
+        es óptimo cuando el líquido de diálisis circula sólo una vez (paso único), a contracorriente y paralelo al flujo de la sangre.</p>
+    `;
+        // Mostrar el modal
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+
+    // Función para mostrar el mensaje de Dialisancia Iónica
+    window.mostrarDialisancia = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+        <p>La dialisancia iónica se define como la transferencia de iones a través de la membrana del dializador en ambos 
+        sentidos. Está basada en la medida de la conductividad en el líquido de diálisis a la entrada y a la salida. La 
+        conductividad a la entrada depende de la cantidad de iones disueltos en el líquido de diálisis, mientras que la 
+        conductividad a la salida depende del efecto que el intercambio de iones con el plasma ejerce sobre la conductividad 
+        a la entrada del líquido de diálisis.</p>
+        <p>Asumiendo que la transferencia de iones es similar a la transferencia de urea, se puede concluir que la dialisancia 
+        iónica y el aclaramiento de urea son similares. Muchos de los modernos monitores de HD incluyen la determinación 
+        continua de este parámetro, que se muestra en pantalla.</p>
+    `;
+        // Mostrar el modal
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+
+    // Función para mostrar el mensaje de Ultrafiltración
+    window.mostrarUltrafiltracion = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+        <p>Consiste en el paso simultáneo a través de la membrana de diálisis del solvente (agua plasmática) acompañado 
+        de los solutos que pueden atravesar los poros de la membrana, bajo el efecto de un gradiente de presión hidrostática. 
+        El ultrafiltrado es el líquido extraído de la sangre a través de la membrana de diálisis por este mecanismo.</p>
+        <p>Su función es eliminar durante la sesión de diálisis el líquido retenido durante el período entrediálisis.</p>
+    `;
+        // Mostrar el modal
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+
+    // Función para mostrar el mensaje de Difusión
+    window.mostrarDifusion = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+        <p>Consiste en el transporte pasivo de solutos a través de la membrana del dializador y se produce por la diferencia 
+        de concentración entre ambos compartimientos. La cantidad de un soluto que difunde a través de la membrana depende 
+        de dos factores:</p>
+        <ul>
+            <li>Coeficiente de transferencia de masas del dializador (KoA)</li>
+            <li>Gradiente de concentración</li>
+        </ul>
+    `;
+        // Mostrar el modal
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+
+    
+    window.mostrarMensajeConductividad = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+            <p>La conductividad del agua es un parámetro comúnmente utilizado para medir la pureza del agua utilizada en la hemodiálisis. 
+            Este valor está relacionado con la capacidad del agua para conducir corriente eléctrica, lo cual aumenta conforme mayor es la concentración de partículas con carga en el líquido.</p>
+            <p>Un valor más bajo de conductividad indica mayor pureza del agua, lo que es deseable para evitar la alteración de la composición del líquido dializante.</p>
+        `;
+        // Mostrar el modal
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+
+    window.mostrarMensajeTemperatura = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+            <p>La temperatura del líquido dializante debe mantenerse dentro de un rango específico, entre 35°C y 37°C. 
+            Temperaturas más altas de 37.5°C pueden inducir la coagulación sanguínea, lo que afectaría negativamente el tratamiento.</p>
+            <p>Por otro lado, temperaturas inferiores a 34°C pueden causar hipotermia al paciente, lo cual es peligroso durante el proceso de diálisis.</p>
+        `;
+        // Mostrar el modal
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+
+    window.mostrarMensajePresion = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+            <p>La presión del sistema de hemodiálisis se mide en bares y debe mantenerse dentro de un rango normal de entre 1.5 y 2.5 bares. 
+            Si la presión es demasiado alta, puede indicar una obstrucción en el sistema, lo que podría comprometer la seguridad del tratamiento.</p>
+            <p>Por el contrario, una presión baja podría ser un indicativo de una fuga en el sistema o un mal funcionamiento del equipo.</p>
+        `;
+        // Mostrar el modal
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+    window.mostrarMensajeLiquidoDialisis = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+            <p>El líquido de diálisis es un fluido acuoso que contiene electrolitos, buffer, y usualmente glucosa. 
+            Este se utiliza para intercambiar solutos con la sangre durante la hemodiálisis. A menudo se lo denomina dializado o solución de diálisis.</p>
+            <p>El líquido de diálisis fresco es el que ingresa al dializador, mientras que el líquido de diálisis usado es el que egresa de este.</p>
+        `;
+        // Mostrar el modal
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+
+    window.mostrarMensajeLiquidoDialisisUltra = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+            <p>El líquido de diálisis ultrapuro es una forma altamente purificada de líquido de diálisis que puede ser utilizado en lugar del líquido de diálisis convencional.</p>
+        `;
+        // Mostrar el modal
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+
+    window.mostrarMensajeConcentradoAcido = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+            <p>El concentrado ácido es una solución ácida de sales concentradas que, cuando se diluye con agua purificada y con el concentrado de bicarbonato, produce el líquido dializante. 
+            En términos generales, la mayoría de los pacientes pueden dializarse con concentraciones iónicas estandarizadas del concentrado ácido, aunque se recomienda individualizar el tipo de concentrado según las necesidades del paciente.</p>
+        `;
+        // Mostrar el modal
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+
+    window.mostrarMensajeConcentradoBicarbonato = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+            <p>El concentrado de bicarbonato es una solución concentrada de bicarbonato sódico. Cuando se diluye con agua purificada y con el concentrado ácido, se obtiene el líquido dializante.</p>
+            <p>Algunos concentrados de bicarbonato también contienen cloruro sódico. El bicarbonato en forma de polvo es actualmente el sistema recomendado para la fabricación del líquido de diálisis. 
+            El bicarbonato sobrante de una sesión de diálisis debe desecharse.</p>
+        `;
+        // Mostrar el modal
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+
+
+    window.mostrarMensajeDrenaje = function () {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+            <p>Después de salir del dializador, el líquido de diálisis usado se dirige a un sistema de tratamiento o desecho específico, según las normativas locales y las políticas del centro de hemodiálisis.</p>
+            <p><strong>Opciones comunes:</strong></p>
+            <ul>
+                <li><strong>Desagüe:</strong> Es la opción más común, eliminando el líquido a través del sistema de alcantarillado del hospital o clínica.</li>
+                <li><strong>Tratamiento:</strong> Algunos centros tratan el líquido antes de desecharlo, especialmente donde hay regulaciones ambientales estrictas.</li>
+                <li><strong>Reutilización:</strong> Aunque poco frecuente, en algunas circunstancias el líquido puede ser purificado y reutilizado.</li>
+            </ul>
+        `;
+        var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+        myModal.show();
+    };
+
+    window.mostrarMensajePTM = function () {
+    const modalBody = document.getElementById('modal-body');
+    modalBody.innerHTML = `
+        <p>La <strong>Presión Transmembrana (PTM)</strong> es el gradiente teórico de presiones que se genera dentro del dializador entre los compartimentos de sangre (<em>Pb</em>) y de líquido de diálisis (<em>Pd</em>).</p>
+    `;
+    var myModal = new bootstrap.Modal(document.getElementById('miModal'));
+    myModal.show();
+};
+
+</script>
+
+
+{% endblock %}

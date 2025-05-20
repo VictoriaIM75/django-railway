@@ -1,0 +1,39 @@
+{% extends 'accounts/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div class="card p-4 shadow-sm" style="min-width: 320px; max-width: 500px; width: 100%;">
+    <head>
+        <title>Editar Quiz - Confirmar Contraseña</title>
+    </head>
+    <body>
+        <h2>Confirmar Contraseña</h2>
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <label>Contraseña:</label><br>
+            <input type="password" name="password" required><br><br>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-success m-1 " >Entrar</button>
+
+                <a href="{% url 'inicio' %}" class="btn btn-danger m-1">Cerrar</a>
+            </div>
+        </form>
+        
+
+
+    </body>
+    
+</div>
+
+    
+</div>
+
+
+
+{% endblock %}

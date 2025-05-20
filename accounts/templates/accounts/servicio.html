@@ -1,0 +1,322 @@
+{% extends 'accounts/main.html' %}
+
+{% block content %}
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+
+
+
+<style>
+  body {
+    background-color: #d3d7dd;
+  }
+
+  .card {
+    border-radius: 1rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-header {
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  .slider-value {
+    font-weight: bold;
+    text-align: center;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    /* Chrome, Safari, Opera */
+    appearance: none;
+    /* Firefox, Edge */
+    width: 100%;
+    height: 8px;
+    background: #ffffff;
+    border-radius: 5px;
+    outline: none;
+  }
+
+  /* Track */
+  input[type=range]::-webkit-slider-runnable-track {
+    height: 8px;
+    background: #fd210d;
+    /* Cambia este color */
+    border-radius: 5px;
+  }
+
+  /* Thumb (el "botón" del slider) */
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #ff1c07;
+    /* Amarillo */
+    margin-top: -6px;
+    /* Alinear con el track */
+    cursor: pointer;
+  }
+
+  /* Firefox */
+  input[type=range]::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #ffc107;
+    cursor: pointer;
+  }
+
+  input[type=range]::-moz-range-track {
+    background: #0d6efd;
+    height: 8px;
+    border-radius: 5px;
+  }
+
+  #pwmSlider::-webkit-slider-runnable-track {
+    background: #ed1111;
+  }
+
+  .colorCardPWM {
+    background: #ed1111;
+  }
+
+  #pwmSlider::-webkit-slider-thumb {
+    background: #d01414;
+    /* Gris oscuro */
+  }
+</style>
+
+
+<body>
+
+  <div class="container py-5">
+    <h1 class="text-center mb-5 ">Servicio Técnico</h1>
+
+    <div class="row g-3 justify-content-center">
+
+      <!-- PWM Bomba Principal -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card bg-light">
+          <div class="card-header colorCardPWM text-white text-center">
+            PWM Bomba Principal
+          </div>
+          <div class="card-body">
+            <input type="range" class="form-range container-fluid" min="0" max="100" step="1" id="pwmSlider">
+            <div class="slider-value mt-2" id="valor">50%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bombas Ácido y Bicarbonato -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card bg-light">
+          <div class="card-header bg-success text-white text-center">
+            Control Bombas de Concentrados
+          </div>
+          <div class="card-body text-center">
+            <div class="d-flex justify-content-center gap-3">
+              <div class="m-3">
+                <input type="checkbox" id="toggleAcido" data-toggle="toggle" data-on="Ácido ON" data-off="Ácido OFF"
+                  data-onstyle="success" data-offstyle="secondary">
+              </div>
+              <div>
+                <input type="checkbox" id="toggleBicarbonato" data-toggle="toggle" data-on="Bicarbonato ON"
+                  data-off="Bicarbonato OFF" data-onstyle="success" data-offstyle="secondary">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Encendido Foco Piloto -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card bg-light">
+          <div class="card-header bg-warning text-dark text-center">
+            Foco Piloto
+          </div>
+          <div class="card-body text-center">
+            <input type="checkbox" id="toggleFoco" checked data-toggle="toggle" data-on="Encendido" data-off="Apagado"
+              data-onstyle="warning" data-offstyle="secondary">
+          </div>
+
+        </div>
+      </div>
+
+
+
+
+
+    </div>
+
+    <div class="row mt-3">
+
+
+      <!-- Calibración de Conductividad -->
+      <div class="col-md-4 col-lg-4">
+        <div class="  card bg-light">
+          <div class="card-header bg-info text-white text-center">
+            Calibración Conductividad
+          </div>
+          <div class=" card-body">
+            <label for="calibracionConductividad" class="form-label">Ingrese valor de calibración (uS/cm):</label>
+            <div class="d-flex">
+              <input type="number" class="form-control" id="calibracionConductividad" placeholder="Ej: 1200">
+              <button class="btn btn-info ml-2" onclick="enviarCalibracion()">Calibrar</button>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón Led Integrado -->
+      <div class="col-md-4 col-lg-4">
+        <div class="card bg-light">
+          <div class="card-header bg-warning text-white text-center">
+            Led integrado
+          </div>
+          <div class="card-body text-center">
+            <button class="btn btn-success ml-2" onclick="enviarComando('LON')">Encender</button>
+            <button class="btn btn-danger ml-2" onclick="enviarComando('LOFF')">Apagar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Objetivo de Conductividad -->
+
+      <div class="col-md-4 col-lg-4">
+        <div class="  card bg-light">
+          <div class="card-header bg-info text-white text-center">
+            Valor Objetivo de Conductividad
+          </div>
+          <div class=" card-body">
+            <label for="calibracionConductividad" class="form-label">Ingrese valor objetivo (uS/cm):</label>
+            <div class="d-flex">
+              <input type="number" class="form-control" id="objetivoConductividad" placeholder="Ej: 1500">
+              <button class="btn btn-info ml-2" onclick="enviarObjetivoConductividad()">Set</button>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+
+    </div>
+
+
+    <div class="row mt-3  ">
+      <!-- Botón modo automatico -->
+      <div class="col-md-4 col-lg-4 mx-auto">
+        <div class="card bg-light">
+          <div class="card-header bg-danger text-white text-center">
+            Servicio Técnico Completado (auto)
+          </div>
+          <div class="card-body text-center">
+            <!-- Enlace con estilo de botón rojo -->
+            <a href="{% url 'inicio' %}" class="btn btn-danger btn-lg" onclick="enviarComando('AUTO')">Salir</a>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+      <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+
+
+      <script>
+        // Detectar cambios en los switches
+        $('#toggleFoco, #toggleAcido, #toggleBicarbonato').change(function () {
+          const id = $(this).attr('id');
+          const estado = $(this).prop('checked') ? 'ON' : 'OFF';
+
+          // Mapear IDs a comandos del ESP32
+          let comando = "";
+          if (id === "toggleFoco") comando = (estado === 'ON') ? "FPON" : "FPOFF";
+          else if (id === "toggleAcido") comando = (estado === 'ON') ? "BAON" : "BAOFF";
+          else if (id === "toggleBicarbonato") comando = (estado === 'ON') ? "BBON" : "BBOFF";
+
+          // Enviar comando
+          enviarComando(comando);
+        });
+
+        $('#pwmSlider').on('input', function () {
+          const valor = $(this).val();
+          $('#valor').text(valor + "%");
+          fetch(`http://192.168.0.28/comando?accion=PWM&valor=${valor}`)
+            .then(response => response.text())
+            .then(texto => {
+              console.log("Respuesta del ESP32:", texto);
+            });
+        });
+
+        function enviarCalibracion() {
+          const valor = document.getElementById('calibracionConductividad').value;
+
+          if (valor === "") {
+            alert("Por favor, ingresa un valor de calibración.");
+            return;
+          }
+
+          // Usa tu función existente
+          enviarComando(`CAL&valor=${valor}`);
+        }
+
+        function enviarObjetivoConductividad() {
+          const valor = document.getElementById('objetivoConductividad').value;
+
+          if (valor === "") {
+            alert("Por favor, ingresa un valor.");
+            return;
+          }
+
+          // Usa tu función existente
+          enviarComando(`CO&valor=${valor}`);
+        }
+
+
+        function enviarComando(comando) {
+          fetch(`http://192.168.0.28/comando?accion=${comando}`)
+            .then(response => response.text())
+            .then(texto => {
+              console.log("Respuesta del ESP32:", texto);
+            })
+            .catch(error => {
+              console.error("Error al enviar comando:", error);
+            });
+        }
+      </script>
+
+      <!-- ctrl+/ -->
+      <!-- <script>
+  const slider = document.getElementById("pwmBomba");
+  const pwmValue = document.getElementById("pwmBombaValue");
+  slider.addEventListener("input", () => {
+    pwmValue.textContent = slider.value + "%";
+  });
+  // Ejemplo de capturar cambios en los toggle
+  $('#toggleFoco, #toggleAcido, #toggleBicarbonato').change(function() {
+    const id = $(this).attr('id');
+    const estado = $(this).prop('checked') ? 'encendido' : 'apagado';
+    console.log(`${id}: ${estado}`);
+    // Aquí podrías enviar por fetch/ajax a tu ESP32 o backend
+  });
+
+</script> -->
+
+
+
+</body>
+
+
+{% endblock content %}

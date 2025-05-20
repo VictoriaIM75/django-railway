@@ -1,0 +1,17 @@
+{% extends 'accounts/main.html' %}
+
+{% block content %}
+<br>
+<div class="row">
+  <div class="col-md-6 offset-md-3">
+    <div class="card card-body text-center">
+      <h5>¿Estás seguro que deseas eliminar al usuario "{{ item.username }}"?</h5>
+      <form method="POST">
+        {% csrf_token %}
+        <a href="{% url 'usuarios_page' %}" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

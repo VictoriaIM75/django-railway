@@ -1,0 +1,142 @@
+{% extends 'accounts/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<head>
+    <title>Editar Preguntas</title>
+</head>
+<body>
+    <div class="container mt-4">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Panel de Edición del Quiz</h2>
+            <h5 class="card-subtitle mb-3 text-muted">Añadir Nueva Pregunta</h5>
+
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="accion" value="crear">
+
+                <div class="form-group mb-3">
+                    <label><strong>Texto de la Pregunta:</strong></label>
+                    <input type="text" name="texto_pregunta" class="form-control" required>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label><strong>Categoría (Etapa 1 a Etapa 5):</strong></label>
+                    <select name="categoria" class="form-control" required>
+                        <option value="Etapa 1">Etapa 1</option>
+                        <option value="Etapa 2">Etapa 2</option>
+                        <option value="Etapa 3">Etapa 3</option>
+                        <option value="Etapa 4">Etapa 4</option>
+                        <option value="Etapa 5">Etapa 5</option>
+                    </select>
+                </div>
+
+                <div class="row">
+                    {% for i in "1234" %}
+                        <div class="col-md-6 mb-3">
+                            <label>Opción {{ i }}:</label>
+                            <input type="text" name="opcion_{{ i }}" class="form-control" required>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group mb-4">
+                    <label><strong>¿Cuál opción es la correcta? (1 a 4):</strong></label>
+                    <input type="number" name="opcion_correcta" min="1" max="4" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-success">Guardar Pregunta</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+ 
+    <hr>
+
+    <h3>Preguntas Existentes</h3>
+    {% for pregunta in preguntas %}
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form method="post" class="mb-3">
+                {% csrf_token %}
+                <input type="hidden" name="accion" value="editar">
+                <input type="hidden" name="pregunta_id" value="{{ pregunta.id }}">
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label><strong>Pregunta:</strong></label>
+                            <input type="text" name="texto_pregunta" value="{{ pregunta.texto }}" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label><strong>Categoría:</strong></label>
+                            <select name="categoria" class="form-control" required>
+                                {% for etapa in etapas %}
+                                    <option value="{{ etapa }}" {% if pregunta.categoria == etapa %}selected{% endif %}>{{ etapa }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    {% for opcion in pregunta.opciones.all %}
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Opción {{ forloop.counter }}:</label>
+                                <input type="text" name="opcion_{{ opcion.id }}" value="{{ opcion.texto }}" class="form-control" required>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="opcion_correcta" value="{{ opcion.id }}" {% if opcion.es_correcta %}checked{% endif %}>
+                                <label class="form-check-label">Es correcta</label>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <hr>
+                <!-- Formulario para añadir nueva respuesta -->
+                 <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="accion" value="añadir_opcion">
+                    <input type="hidden" name="pregunta_id" value="{{ pregunta.id }}">
+                    <input type="text" name="texto_opcion" placeholder="Nueva respuesta" required>
+                    <label>
+                        <input type="checkbox" name="es_correcta"> Es correcta
+                    </label>
+                    <button type="submit">Añadir respuesta</button>
+                </form>
+
+          
+
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </form>
+
+            <form method="post" class="text-right">
+                {% csrf_token %}
+                <input type="hidden" name="accion" value="eliminar">
+                <input type="hidden" name="pregunta_id" value="{{ pregunta.id }}">
+                <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar Pregunta</button>
+            </form>
+        </div>
+    </div>
+{% empty %}
+    <div class="alert alert-info">No hay preguntas aún.</div>
+{% endfor %}
+
+</body>
+
+<div class="container my-4">
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'inicio' %}" class="btn btn-danger">Cerrar</a>
+    </div>
+</div>
+
+{% endblock %}

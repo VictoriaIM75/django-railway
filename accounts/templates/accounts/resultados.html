@@ -1,0 +1,61 @@
+{% extends 'accounts/main.html' %}
+
+{% load static %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8" />
+    <title>Resultados</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        /* Colores personalizados para cada fila según la etapa */
+        .etapa-1 { background-color: #92D050 !important; }  /* verde claro */
+        .etapa-2 { background-color: #FFC000 !important; }  /* naranja */
+        .etapa-3 { background-color: #00B0F0 !important; }  /* azul */
+        .etapa-4 { background-color: #FF0000 !important; color: aliceblue; }  /* rojo */
+        .etapa-5 { background-color: #7030A0 !important; color: aliceblue;}  /* morado */
+    </style>
+</head>
+<body>
+<div class="container my-5">
+    <h2 class="mb-4 text-center">Resultados de {{ participante.nombre }}</h2>
+
+    <table class="table table-bordered table-striped text-center">
+        <thead class="thead-dark">
+            <tr>
+                <th>Categoría</th>
+                <th>Correctas</th>
+                <th>Incorrectas</th>
+                <th>Puntaje (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for categoria, datos in resumen.items %}
+                <tr class="
+                    {% if categoria == 'Etapa 1' %}etapa-1{% elif categoria == 'Etapa 2' %}etapa-2
+                    {% elif categoria == 'Etapa 3' %}etapa-3{% elif categoria == 'Etapa 4' %}etapa-4
+                    {% elif categoria == 'Etapa 5' %}etapa-5{% endif %}
+                ">
+                    <td>{{ categoria }}</td>
+                    <td>{{ datos.correctas }}</td>
+                    <td>{{ datos.incorrectas }}</td>
+                    <td>{{ datos.puntaje }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3 class="text-center mt-4">Puntaje Total: {{ puntaje_total }}%</h3>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'inicio' %}" class="btn btn-danger btn-lg">Cerrar</a>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'accounts/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Resultados de todos los participantes</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        thead tr {
+            background-color: #f2f2f2;
+        }
+        tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h2>Resultados de todos los participantes</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Materia</th>
+                <th>Fecha</th>
+                <th>Puntaje Total (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for resultado in resultados %}
+            <tr>
+                <td>{{ resultado.participante.nombre }}</td>
+                <td>{{ resultado.participante.materia }}</td>
+                <td>{{ resultado.fecha|date:"Y-m-d H:i" }}</td>
+                <td>{{ resultado.puntaje_total }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No hay resultados aún.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+<div class="container my-4">
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'inicio' %}" class="btn btn-danger">Cerrar</a>
+    </div>
+</div>
+
+</body>
+
+{% endblock %}
