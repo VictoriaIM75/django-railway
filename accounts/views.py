@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import *
 from .decorators import unauthenticated_user, allowed_users, admin_only
-
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group
@@ -16,14 +15,23 @@ from .models import Pregunta, Opcion
 from .filters import OrderFilter, UserFilter
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm
-
-from django.http import JsonResponse
 import requests  # Para hacer la solicitud al ESP32
 
 # Create your views here.
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 
+# Variables para mantener los últimos valores recibidos
+datos_sensores = {
+    "flujo": "0.00",
+    "conductividad": "0",
+    "burbuja": "No Detectada",
+    "mensaje1": "------------"
+}
 
-from django.http import HttpResponse
+# Variable global para almacenar el último comando
+ultimo_comando = ""
 
 
 @allowed_users(allowed_roles=['administrador'])
@@ -95,17 +103,7 @@ def userPage(request):
     context = {}
     return render(request, 'accounts/user.html', context)
 
-@login_required(login_url='login')
-def inicio(request):
-    # Hacer una solicitud GET a la URL del ESP32
-    response = requests.get('http://192.168.0.28/sensorData')
-    sensor_data = response.json()  # Convertir los datos a un formato JSON
 
-    context = {
-        'sensor_data': sensor_data,
-        
-    }
-    return render(request, 'accounts/inicio.html', context)
 
 @login_required(login_url='login')
 def datosSensores(request):
@@ -224,23 +222,6 @@ def usuariosPage(request):
         'myFilter': myFilter,
     }
     return render(request, 'accounts/usuarios.html', context)
-
-
-
-def sensor_data(request):
-    # Hacer una solicitud GET a la URL del ESP32
-    url = 'https://web-production-ad431.up.railway.app/sensorData'
-    response = requests.get(url)
-    
-    # Si la solicitud fue exitosa, obtenemos los datos
-    if response.status_code == 200:
-        sensor_data = response.json()  # Convertir los datos a un formato JSON
-    else:
-        sensor_data = {'error': 'No se pudieron obtener los datos'}
-
-    # Pasar esos datos al contexto de la plantilla
-    return render(request, 'inicio.html', {'sensor_data': sensor_data})
-
 
 
 
@@ -458,3 +439,47 @@ def resultados(request, participante_id):
 def resultados_todos(request):
     resultados = Resultado.objects.select_related('participante').order_by('-fecha')
     return render(request, 'accounts/resultados_todos.html', {'resultados': resultados})
+
+
+
+
+
+@csrf_exempt
+def recibir_comando(request):
+    global ultimo_comando
+    if request.method == "POST":
+        comando = request.POST.get("comando")
+        if comando:
+            ultimo_comando = comando
+            return JsonResponse({"status": "ok", "comando": comando})
+        else:
+            return JsonResponse({"status": "error", "mensaje": "Comando no proporcionado"})
+    return JsonResponse({"status": "error", "mensaje": "Método no permitido"})
+
+def enviar_comando_esp32(request):
+    global ultimo_comando
+    comando = ultimo_comando
+    ultimo_comando = ""  # Se borra luego de enviar para evitar repeticiones
+    return JsonResponse({"comando": comando})
+
+@csrf_exempt
+def actualizar_datos(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+
+            datos_sensores["flujo"] = data.get("flujo", "0.00")
+            datos_sensores["conductividad"] = data.get("conductividad", "0")
+            datos_sensores["burbuja"] = data.get("burbuja", "No Detectada")
+            datos_sensores["mensaje1"] = data.get("mensaje1", "------------")
+
+            return JsonResponse({"status": "ok", "mensaje": "Datos recibidos correctamente."})
+
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "mensaje": "JSON inválido."})
+    else:
+        return JsonResponse({"status": "error", "mensaje": "Método no permitido."})
+
+# Vista que consulta los datos en tiempo real
+def api_datos_sensores(request):
+    return JsonResponse(datos_sensores)

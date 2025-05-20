@@ -37,6 +37,8 @@ urlpatterns = [
 
     path('editar_quiz/', views.editar_quiz, name='editar_quiz'),
     path('resultados_todos/', views.resultados_todos, name='resultados_todos'),
+    path('actualizar_datos', views.actualizar_datos, name='actualizar_datos'),
+    path('api/datos_sensores', views.api_datos_sensores, name='api_datos_sensores'),
 
 
 ]

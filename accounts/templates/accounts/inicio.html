@@ -348,68 +348,77 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/image-map-resizer/1.0.10/js/imageMapResizer.min.js"></script>
 
 
-
-
 <script>
+  // 🔁 Manejador del slider para PWM
+  document.getElementById('pwmSlider').addEventListener('input', function () {
+    const valor = this.value;
+    document.getElementById('valor').innerText = valor + "%";
+    enviarComando(`PWM&valor=${valor}`);
+  });
 
-    $('#pwmSlider').on('input', function () {
-        const valor = $(this).val();
-        $('#valor').text(valor + "%");
-        fetch(`https://web-production-ad431.up.railway.app/comando?accion=PWM&valor=${valor}`)
-        .then(response => response.text())
-        .then(texto => {
-            console.log("Respuesta del ESP32:", texto);
-        });
-    });
+  // Enviar objetivo de conductividad
+  function enviarObjetivoConductividad() {
+    const valor = document.getElementById('objetivoConductividad').value;
 
-    function enviarObjetivoConductividad() {
-        const valor = document.getElementById('objetivoConductividad').value;
-
-        if (valor === "") {
-        alert("Por favor, ingresa un valor.");
-        return;
-        }
-
-        // Usa tu función existente
-        enviarComando(`CO&valor=${valor}`);
+    if (valor === "") {
+      alert("Por favor, ingresa un valor.");
+      return;
     }
 
-function enviarComando(comando) {
-  fetch(`https://web-production-ad431.up.railway.app/comando?accion=${comando}`)
-    .then(response => response.text())
-    .then(texto => {
-      console.log("Respuesta del ESP32:", texto);
+    enviarComando(`CO&valor=${valor}`);
+  }
+
+  // Función para enviar comandos a Django
+  function enviarComando(comando) {
+    fetch("/set_comando", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-CSRFToken": getCookie('csrftoken')
+      },
+      body: `comando=${comando}`
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Comando enviado al servidor Django:", data);
     })
     .catch(error => {
       console.error("Error al enviar comando:", error);
     });
+  }
+
+  // Función auxiliar para obtener el token CSRF
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === name + "=") {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function obtenerDatosSensores() {
+  fetch('/api/datos_sensores')
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('valorFlujo').innerText = data.flujo;
+      document.getElementById('valorConductividad').innerText = data.conductividad;
+      document.getElementById('valorBurbuja').innerText = data.burbuja;
+      document.getElementById('mensaje1').innerText = data.mensaje1;
+    })
+    .catch(error => {
+      console.error('Error al obtener los datos desde Django:', error);
+    });
 }
-</script>
 
-
-<script>
-    
-function obtenerDatosSensores() {
-    fetch('http://192.168.0.28/sensorData')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('valorFlujo').innerText = data.flujo;
-            document.getElementById('valorConductividad').innerText = data.conductividad;
-            document.getElementById('valorBurbuja').innerText = data.burbuja;
-            document.getElementById('mensaje1').innerText = data.mensaje1;
-
-        })
-        .catch(error => {
-            console.error('Error al obtener los datos:', error);
-        });
-}
-
-// Llamar al cargar la página
 obtenerDatosSensores();
-
-// Repetir cada 1 segundo (1000 ms)
 setInterval(obtenerDatosSensores, 1000);
-
 
 </script>
 
