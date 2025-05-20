@@ -483,3 +483,9 @@ def actualizar_datos(request):
 # Vista que consulta los datos en tiempo real
 def api_datos_sensores(request):
     return JsonResponse(datos_sensores)
+
+
+@login_required
+def inicio(request):
+    # tu lógica aquí
+    return render(request, 'accounts/inicio.html')
