@@ -100,9 +100,9 @@ WSGI_APPLICATION = 'gui1.wsgi.application'
 #}
 
 
-print(os.getenv('DATABASE_URL'))
+print(os.getenv('MYSQL_PUBLIC_URL'))
 DATABASES = {
-    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+    'default': dj_database_url.config(default=os.getenv('MYSQL_PUBLIC_URL'))
 }
 
 
