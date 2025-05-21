@@ -236,11 +236,11 @@
 
 <script>
   // Detectar cambios en los toggles (switches)
-document.getElementById('toggleFoco').addEventListener('change', function() {
-  const estado = this.checked ? 'ON' : 'OFF';
-  const comando = (estado === 'ON') ? "FPON" : "FPOFF";
-  enviarComando(comando);
-});
+  $('#toggleFoco').change(function () {
+    const estado = $(this).prop('checked') ? 'ON' : 'OFF';
+    const comando = (estado === 'ON') ? "FPON" : "FPOFF";
+    enviarComando(comando);
+  });
 
 document.getElementById('toggleAcido').addEventListener('change', function() {
   const estado = this.checked ? 'ON' : 'OFF';
